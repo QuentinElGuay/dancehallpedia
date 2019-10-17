@@ -1,0 +1,24 @@
+{% block content %}
+<hr>
+<h1 class="intro-text text-center">{{ step_name }}</h1>
+<hr class="detail-separator">
+<div class="col-md-12">
+  <div style="margin-bottom:45px">
+    <h2 class="text-center artist_name">Artiste</h2>
+    <p>{{ artist_name }}</p>
+  </div>
+
+  {% if videos %}
+    <h2>Videos</h2>
+    <div>
+    {% for video in videos %}
+        <p><a href="{{ video.url }}">{{ video.title }}</a></p>
+        <img src="https://img.youtube.com/vi/{{ video.yid }}/mqdefault.jpg">
+    {% endfor %}
+    </div>
+  {% endif %}
+
+</div>
+
+
+{% endblock %}
