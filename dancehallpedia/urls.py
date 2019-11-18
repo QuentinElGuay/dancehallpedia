@@ -19,8 +19,8 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
 
-from pages import views
-from pages.api.views import ArtistViewSet
+from dance import views
+from dance.api.views import ArtistViewSet
 
 router = routers.DefaultRouter()
 router.register(r'artists', ArtistViewSet)
@@ -28,10 +28,8 @@ router.register(r'artists', ArtistViewSet)
 
 urlpatterns = [
     re_path(r'^$', views.index),
-    re_path(r'^pages/', include('pages.urls')),
+    re_path(r'^dance/', include(('dance.urls', 'dance'), namespace='dance')),
     path('admin/', admin.site.urls),
-    re_path(r'^', include(router.urls)),
-    re_path(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
 if settings.DEBUG:

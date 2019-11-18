@@ -1,0 +1,20 @@
+{% extends 'dance/base.html' %}
+
+{% block content %}
+<div class="container">
+<div class="col">
+    <div class="row">
+        <div class="col-lg-12 detail-separator">
+          <form class="col-md-6 col-md-offset-3 text-center" action="{% url 'dance:video_creation' %}" method="post" accept-charset="utf-8">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="createVideoForm">Add a video</label>
+              <input id="createVideoForm" class="form-control" name="videoUrl" />
+            </div>
+            <span class="help-block" id="helpBlock">Paste in here the link to the video you want to add.</span>
+          </form>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

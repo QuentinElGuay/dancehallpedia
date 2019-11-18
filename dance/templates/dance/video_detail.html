@@ -1,0 +1,83 @@
+{% extends 'dance/base.html' %}
+
+{% block content %}
+<div class="container">
+<div class="col">
+    <div class="row" style="margin-bottom:45px">
+          <div class="col">
+            <hr>
+            <h1 class="intro-text text-center">{{ video.title }}</h1>
+            <hr class="detail-separator">
+          </div>
+    </div>
+
+    <div class="row">
+        <a href="{{ video.url }}">
+        <!-- Switch for  <a href="{ % url 'dance:cat_video_detail' cat_video_id=cat_video.id % }"> -->
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ video.yid }}?start=0&autoplay=0"
+                    frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+            </iframe>
+        </a>
+    </div>
+    <div class="row">
+        <a class="#video-title" href="{{ video.url }}">{{video.title}}</a>
+    </div>
+    <div class="row">
+        <!-- Switch for  <a href="{ % url 'dance:cat_video_detail' cat_video_id=cat_video.id % }"> -->
+        <a href="{{ video.channel_url }}}">{{video.channel}}</a>
+    </div>
+
+  {% if appearances %}
+        <div class="row text-center">
+            <div class="col">
+                <h2>Steps</h2>
+            </div>
+        </div>
+            <div class="row">
+                <div class="col">
+                    <ul>
+                    {% for step, info in appearances.items %}
+                        <li>{{ step }}
+                            {% if info.creator %}
+                                by {{ info.creator }}
+                            {% else %}
+                                [unknown creator]
+                            {% endif %}
+                            ({{ info.time }})
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            </div>
+  {% endif %}
+
+    <div class="row">
+        <div class="col">
+            <h3>Add a step to the video:</h3>
+        </div>
+    </div>
+        <div class="row">
+            <div class="col">
+                  <form class="form-inline" action="{% url 'dance:video_detail' video_id=video.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group {% if form.name.errors %}has-warning has-feedback{% endif %}">
+                      <label for="{{ form.step.id_for_label }}" class="control-label">Step</label>
+                      {{ form.step }}
+                    </div>
+                    <div class="form-group {% if form.minutes.errors %}has-warning has-feedback{% endif %}">
+                      <label for="{{ form.minutes.id_for_label }}" class="control-label">Time</label>
+                      {{ form.minutes }}
+                    </div>
+                    <div class="form-group {% if form.seconds.errors %}has-warning has-feedback{% endif %}">
+                      <label for="{{ form.seconds.id_for_label }}" class="control-label">:</label>
+                      {{ form.seconds }}
+                    </div>
+                    <button type="submit" class="btn btn-success">Add</button>
+                  </form>
+            </div>
+        </div>
+
+</div>
+</div>
+{% endblock %}

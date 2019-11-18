@@ -1,24 +1,60 @@
+{% extends 'dance/base.html' %}
+
 {% block content %}
-<hr>
-<h1 class="intro-text text-center">{{ step_name }}</h1>
-<hr class="detail-separator">
-<div class="col-md-12">
-  <div style="margin-bottom:45px">
-    <h2 class="text-center artist_name">Artiste</h2>
-    <p>{{ artist_name }}</p>
-  </div>
+<div class="col">
+<div class="container">
+    <div class="row" style="margin-bottom:45px">
+          <div class="col">
+            <hr>
+            <h1 class="intro-text text-center">{{ step_name }} by {{ artist_name }}</h1>
+            {% if other_names %}
+                <p class="text-center">also known as: {{ other_names }}</p>
+             {% endif %}
+            <hr class="detail-separator">
+          </div>
+    </div>
 
   {% if videos %}
-    <h2>Videos</h2>
-    <div>
-    {% for video in videos %}
-        <p><a href="{{ video.url }}">{{ video.title }}</a></p>
-        <img src="https://img.youtube.com/vi/{{ video.yid }}/mqdefault.jpg">
-    {% endfor %}
-    </div>
+        <div class="row text-center">
+            <div class="col">
+                <h2>Videos</h2>
+            </div>
+        </div>
+        {% for category, video_list in videos.items %}
+            <div class="row">
+                <div class="col">
+                    <h4>{{ category }}</h4>
+                </div>
+            </div>
+            <div class="row thumbnails">
+                {% for cat_video in video_list %}
+                    <div class="col-sm-4">
+                        <div class="row justify-content-center">
+                            <div class="col-xs-12">
+                                <div class="box">
+                                    <div class="row">
+                                        <a href="{{ cat_video.data.url }}?t={{ cat_video.time }}">
+                                        <!-- Switch for  <a href="{ % url 'dance:cat_video_detail' cat_video_id=cat_video.id % }"> -->
+                                            <img class="img-responsive" src="https://img.youtube.com/vi/{{ cat_video.data.yid }}/hqdefault.jpg" alt="{{cat_video.title}}" />
+                                        </a>
+                                    </div>
+                                    <div class="row">
+                                        <a class="#video-title" href="{{ cat_video.data.url }}&t={{ cat_video.time }}">{{cat_video.data.title}}</a>
+                                    </div>
+                                    <div class="row">
+                                        <!-- Switch for  <a href="{ % url 'dance:cat_video_detail' cat_video_id=cat_video.id % }"> -->
+                                        <a href="{{ cat_video.data.channel_url }}}">{{cat_video.data.channel}}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   {% if forloop.counter|divisibleby:3 %} <div class="clearfix"></div>{% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
   {% endif %}
 
 </div>
-
-
+</div>
 {% endblock %}

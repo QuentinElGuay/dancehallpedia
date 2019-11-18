@@ -7,6 +7,10 @@ html {
   /* 2 */
 }
 
+.row {
+    border: 1px solid red;
+}
+
 /* Sections
    ========================================================================== */
 /**
@@ -811,7 +815,6 @@ legend {
 }
 
 .s003 {
-  min-height: 100vh;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-pack: center;
@@ -823,6 +826,10 @@ legend {
   background-size: cover;
   background-position: center center;
   padding: 15px;
+}
+
+.full_height {
+  min-height: 100vh;
 }
 
 .s003 form {

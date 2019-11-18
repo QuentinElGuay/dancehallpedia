@@ -37,6 +37,11 @@ class Step(models.Model):
         return self.name
 
 
+class AlternativeStepName(models.Model):
+    step = models.ForeignKey(Step, on_delete=models.CASCADE, blank=False, null=False)
+    value = models.CharField(max_length=100, db_index=True)
+
+
 class Tag(models.Model):
     name = models.CharField(max_length=30, db_index=True)
     tags = models.ManyToManyField(Step, related_name='tags', blank=True)
@@ -83,4 +88,6 @@ class StepAppearance(models.Model):
     time = models.IntegerField(null=True)
 
     class Meta:
-        unique_together = [['video', 'step', 'time']]
+        constraints = [
+            models.UniqueConstraint(fields=['video', 'step', 'time'], name='step uniqueness')
+        ]
