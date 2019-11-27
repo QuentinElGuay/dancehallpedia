@@ -1,8 +1,8 @@
-import operator
 from collections import defaultdict
 
 from django.contrib import messages
 from django.contrib.postgres.search import TrigramSimilarity
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import transaction, IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -10,7 +10,7 @@ from django.template import loader
 
 
 from common.video import get_video_data
-from dance.forms import AddStepAppearanceForm, AddStepAppearanceErrorList, AddStepErrorList
+from dance.forms import AddStepAppearanceForm, AddStepAppearanceErrorList, GenericErrorList, StepForm, ArtistForm
 from .models import Step, StepAppearance, AlternativeStepName, Artist, Video
 
 
@@ -24,38 +24,39 @@ def list_steps(request):
     context = {
         'steps': steps
     }
-    template = loader.get_template('dance/list_steps.html')
+    template = loader.get_template('dance/step_list.html')
     return HttpResponse(template.render(context, request=request))
-
-
-class AddStepForm(object):
-    pass
 
 
 def step_creation(request):
 
-    if request.method != 'POST':
-        return render(request, 'dance/create_step.html')
+    form = StepForm()
 
-    form = AddStepForm(request.POST, error_class=AddStepErrorList)
+    if request.method != 'POST':
+        context = {
+            'form': form,
+        }
+        return render(request, 'dance/create_step.html', context)
+
+    form = StepForm(request.POST, error_class=GenericErrorList)
     if form.is_valid():
         creator = form.cleaned_data['creator']
         name = form.cleaned_data['name']
         school = form.cleaned_data['school']
 
-    # TODO: add more security, check for similar steps for creator and similar name
+        # TODO: add more security, check for similar steps for creator and similar name
 
-    try:
-        with transaction.atomic():
-            step = Step.objects.create(name=name, creator_id=creator, school=school)
-            step.save()
+        try:
+            with transaction.atomic():
+                step = Step.objects.create(name=name, creator=creator, school=school)
+                step.save()
 
-        messages.success(request, 'Step created successfully')
+            messages.success(request, 'Step created successfully')
 
-    except IntegrityError:
-        form.errors['internal'] = "An internal error append, please retry."
+        except IntegrityError:
+            form.errors['internal'] = "An internal error append, please retry."
 
-    return redirect('dance:step_detail', video_id=step.id)
+    return redirect('dance:step_detail', step_id=step.id)
 
 
 def step_detail(request, step_id):
@@ -75,7 +76,7 @@ def step_detail(request, step_id):
     context = {
         'step_name': step.name,
         'other_names': list_alternative_names,
-        'artist_name': step.creator.name,
+        'artist_name': step.creator.name if step.creator else 'unknown artist',
         'school': step.school,
         'videos': videos,
     }
@@ -102,17 +103,83 @@ def search_step(request):
         'title': title,
     }
 
-    return render(request, 'dance/list_steps.html', context)
+    return render(request, 'dance/step_list.html', context)
+
+
+def step_list(request):
+    steps_list = Step.objects.order_by('name')
+    paginator = Paginator(steps_list, 50)
+    page = request.GET.get('page')
+
+    try:
+        steps = paginator.page(page)
+    except PageNotAnInteger:
+        steps = paginator.page(1)
+    except EmptyPage:
+        steps = paginator.page(paginator.num_pages)
+
+    context = {
+        'steps': steps,
+        'paginate': True
+    }
+    return render(request, 'dance/step_list.html', context)
+
+
+def artist_creation(request):
+
+    form = ArtistForm()
+
+    if request.method == 'POST':
+        form = ArtistForm(request.POST, error_class=GenericErrorList)
+        if form.is_valid():
+            # TODO: add more security, check for similar artist names
+
+            try:
+                with transaction.atomic():
+                    artist = form.save()
+
+                messages.success(request, 'Step created successfully')
+
+            except IntegrityError:
+                form.errors['internal'] = "An internal error append, please retry."
+
+            return redirect('dance:artist_detail', artist_id=artist.id)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'dance/create_artist.html', context)
 
 
 def artist_detail(request, artist_id):
     artist = get_object_or_404(Artist, pk=artist_id)
+    artist_steps = Step.objects.filter(creator__id=artist_id).all().order_by('name')
 
     context = {
         'artist_name': artist.name,
+        'artist_steps': artist_steps,
     }
 
     return render(request, 'dance/artist_detail.html', context)
+
+
+def artist_list(request):
+    artists_list = Artist.objects.order_by('name')
+    paginator = Paginator(artists_list, 50)
+    page = request.GET.get('page')
+
+    try:
+        artists = paginator.page(page)
+    except PageNotAnInteger:
+        artists = paginator.page(1)
+    except EmptyPage:
+        artists = paginator.page(paginator.num_pages)
+
+    context = {
+        'artists': artists,
+        'paginate': True
+    }
+    return render(request, 'dance/artist_list.html', context)
 
 
 def video_detail(request, video_id):
@@ -139,7 +206,7 @@ def video_detail(request, video_id):
     appearances = dict()
     step_appearances = StepAppearance.objects.filter(video__id=video_id).all().order_by('time')
     for appearance in step_appearances:
-        appearances[appearance.step.name] = {'creator': appearance.step.creator, 'time': appearance.time}
+        appearances[appearance.step] = {'creator': appearance.step.creator, 'time': appearance.time}
 
     form = AddStepAppearanceForm(request.POST, error_class=AddStepAppearanceErrorList)
 

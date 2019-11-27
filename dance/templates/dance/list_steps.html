@@ -1,5 +1,0 @@
-<ul>
-{% for step in steps %}
-    <li><a href="{% url 'dance:detail' step_id=step.id %}">{{ step.name }}</a> by <a href="{% url 'dance:detail' creator_id=step.creator.id %}">{{ step.creator }}</a></li>
-{% endfor %}
-</ul>

@@ -1,0 +1,53 @@
+{% extends 'dance/base.html' %}
+
+{% block content %}
+<ul>
+{% for step in steps %}
+    <li><a href="{% url 'dance:step_detail' step_id=step.id %}">{{ step.name }}</a>
+    {% if step.creator %}
+        by <a href="{% url 'dance:artist_detail' artist_id=step.creator.id %}">{{ step.creator }}</a></li>
+    {% endif %}
+{% endfor %}
+</ul>
+
+{% if steps.has_other_pages %}
+<ul class="pagination">
+  {% if steps.has_previous %}
+      <li><a href="?page={{ steps.previous_page_number }}"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+  {% else %}
+      <li class="disabled"><span><i class="fa fa-chevron-left" aria-hidden="true"></i></span></li>
+  {% endif %}
+
+  {% if steps.number > 1 %}
+  <li><a href="?page=1">1</a></li>
+  {% endif %}
+
+  {% if steps.number|add:'-4' > 1 %}
+      <li><a href="?page={{ steps.number|add:'-5' }}">&hellip;</a></li>
+  {% endif %}
+
+  {% for i in steps.paginator.page_range %}
+      {% if steps.number == i %}
+          <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+      {% elif i > steps.number|add:'-5' and i < steps.number|add:'5' and i > 1 and i < steps.paginator.num_pages %}
+          <li><a href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+  {% endfor %}
+
+  {% if steps.paginator.num_pages > steps.number|add:'4' %}
+      <li><a href="?page={{ steps.number|add:'5' }}">&hellip;</a></li>
+  {% endif %}
+
+  {% if steps.number < steps.paginator.num_pages %}
+    <li><a href="?page={{ steps.paginator.num_pages }}">{{ steps.paginator.num_pages }}</a></li>
+  {% endif %}
+
+  {% if steps.has_next %}
+      <li><a href="?page={{ steps.next_page_number }}"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+  {% else %}
+      <li class="disabled"><span><i class="fa fa-chevron-right" aria-hidden="true"></i></span></li>
+  {% endif %}
+  </ul>
+{% endif %}
+
+{% endblock %}

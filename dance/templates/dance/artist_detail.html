@@ -10,6 +10,20 @@
             <hr class="detail-separator">
           </div>
     </div>
+    <div class="row">
+        <div class="col">
+            <h3>Steps</h3>
+            {% if artist_steps %}
+                <ul>
+                {% for step in artist_steps %}
+                    <li>
+                        <a href="{% url 'dance:step_detail' step_id=step.id %}">{{ step.name }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
 </div>
 </div>
 {% endblock %}

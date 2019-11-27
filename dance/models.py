@@ -13,6 +13,11 @@ class Artist(models.Model):
         return self.name
 
 
+class AlternativeArtistName(models.Model):
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, blank=False, null=False)
+    value = models.CharField(max_length=100, db_index=True)
+
+
 class Step(models.Model):
     UNKNOWN = 0
     OLD = 1
@@ -25,7 +30,7 @@ class Step(models.Model):
         (NEW, 'New school'),
     ]
 
-    name = models.CharField(max_length=100, db_index=True)
+    name = models.CharField(max_length=100, unique=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(Artist, on_delete=models.SET_NULL, blank=True, null=True)
     school = models.IntegerField(

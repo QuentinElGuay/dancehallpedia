@@ -38,9 +38,9 @@
                 <div class="col">
                     <ul>
                     {% for step, info in appearances.items %}
-                        <li>{{ step }}
+                        <li><a href="{% url 'dance:step_detail' step_id=step.id %}">{{ step.name }}</a>
                             {% if info.creator %}
-                                by {{ info.creator }}
+                            by <a href="{% url 'dance:artist_detail' artist_id=info.creator.id %}">{{ info.creator }}</a>
                             {% else %}
                                 [unknown creator]
                             {% endif %}

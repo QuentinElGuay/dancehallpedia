@@ -62,6 +62,7 @@ class StepFilter(filters.FilterSet):
         model = Step
         fields = {
             'name': ['icontains', 'iexact'],
+            'creator': ['exact'],
         }
 
 

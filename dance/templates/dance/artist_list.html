@@ -1,0 +1,50 @@
+{% extends 'dance/base.html' %}
+
+{% block content %}
+<ul>
+{% for artist in artists %}
+    <li><a href="{% url 'dance:artist_detail' artist_id=artist.id %}">{{ artist.name }}</a>
+{% endfor %}
+</ul>
+
+{% if artists.has_other_pages %}
+<ul class="pagination">
+  {% if artists.has_previous %}
+      <li><a href="?page={{ artists.previous_page_number }}"><i class="fa fa-chevron-left" aria-hidden="true"></i></a></li>
+  {% else %}
+      <li class="disabled"><span><i class="fa fa-chevron-left" aria-hidden="true"></i></span></li>
+  {% endif %}
+
+  {% if artists.number > 1 %}
+  <li><a href="?page=1">1</a></li>
+  {% endif %}
+
+  {% if artists.number|add:'-4' > 1 %}
+      <li><a href="?page={{ artists.number|add:'-5' }}">&hellip;</a></li>
+  {% endif %}
+
+  {% for i in artists.paginator.page_range %}
+      {% if artists.number == i %}
+          <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+      {% elif i > artists.number|add:'-5' and i < artists.number|add:'5' and i > 1 and i < artists.paginator.num_pages %}
+          <li><a href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+  {% endfor %}
+
+  {% if artists.paginator.num_pages > artists.number|add:'4' %}
+      <li><a href="?page={{ artists.number|add:'5' }}">&hellip;</a></li>
+  {% endif %}
+
+  {% if artists.number < artists.paginator.num_pages %}
+    <li><a href="?page={{ artists.paginator.num_pages }}">{{ artists.paginator.num_pages }}</a></li>
+  {% endif %}
+
+  {% if artists.has_next %}
+      <li><a href="?page={{ artists.next_page_number }}"><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+  {% else %}
+      <li class="disabled"><span><i class="fa fa-chevron-right" aria-hidden="true"></i></span></li>
+  {% endif %}
+  </ul>
+{% endif %}
+
+{% endblock %}

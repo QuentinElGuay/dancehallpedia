@@ -1,6 +1,6 @@
-from django.forms import ChoiceField, TimeField, TimeInput, Form, IntegerField, ModelForm
+from django.forms import ChoiceField, ModelChoiceField, Form, IntegerField, ModelForm
 from django.forms.utils import ErrorList
-from .models import StepAppearance, Step
+from .models import StepAppearance, Step, Artist
 
 
 class AddStepAppearanceErrorList(ErrorList):
@@ -23,7 +23,7 @@ class AddStepAppearanceForm(Form):
         self.fields['step'].choices = [(x.pk, x.name) for x in Step.objects.all().order_by('name')]
 
 
-class AddStepErrorList(ErrorList):
+class GenericErrorList(ErrorList):
     def __str__(self):
         return self.as_divs()
 
@@ -34,6 +34,14 @@ class AddStepErrorList(ErrorList):
 
 
 class StepForm(ModelForm):
+    creator = ModelChoiceField(queryset=Artist.objects.order_by('name'))
+
     class Meta:
         model = Step
         fields = ['name', 'creator', 'school']
+
+
+class ArtistForm(ModelForm):
+    class Meta:
+        model = Artist
+        fields = ['name']
